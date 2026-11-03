@@ -1,13 +1,13 @@
 :root {
-  --maroon: #1b090d;
-  --maroon-soft: #2a0e13;
-  --ivory: #f2e8d5;
-  --gold: #c5a363;
-  --gold-bright: #dec184;
+  --maroon: #0c0708;
+  --maroon-soft: #2c0e13;
+  --ivory: #f3ede8;
+  --gold: #af3c40;
+  --gold-bright: #cf6267;
   --beige: #c8b18c;
-  --muted: rgba(242, 232, 213, 0.67);
-  --hairline: rgba(242, 232, 213, 0.17);
-  --serif: 'Cormorant Garamond', Georgia, serif;
+  --muted: rgba(243, 237, 232, 0.67);
+  --hairline: rgba(243, 237, 232, 0.17);
+  --serif: 'Sora', 'Manrope', sans-serif;
   --sans: 'Manrope', sans-serif;
 }
 
@@ -265,7 +265,7 @@
   padding-left: 18px;
   border-left: 1px solid rgba(197, 163, 99, 0.32);
   color: rgba(242, 232, 213, 0.5);
-  font-family: 'Noto Serif Devanagari', serif;
+  font-family: 'Tiro Devanagari Hindi', serif;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -275,10 +275,10 @@
 .hero-title {
   margin: 0;
   font-family: var(--serif);
-  font-size: clamp(4.6rem, 8.25vw, 9rem);
-  font-weight: 400;
-  letter-spacing: -0.052em;
-  line-height: 0.82;
+  font-size: clamp(4.2rem, 7.6vw, 8.2rem);
+  font-weight: 600;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
   perspective: 900px;
 }
 
@@ -297,8 +297,8 @@
 .hero-title-line-italic {
   padding-left: 0.43em;
   color: var(--gold-bright);
-  font-style: italic;
-  font-weight: 400;
+  font-style: normal;
+  font-weight: 600;
 }
 
 .hero-char {
@@ -348,7 +348,7 @@
   overflow: hidden;
   border: 1px solid var(--gold);
   border-radius: 100px;
-  color: #24130c;
+  color: var(--ivory);
   background: var(--gold);
   font-family: var(--sans);
   font-size: 9px;

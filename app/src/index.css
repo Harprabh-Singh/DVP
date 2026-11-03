@@ -5,8 +5,8 @@
 @layer base {
   :root {
     font-family: 'Manrope', sans-serif;
-    color: #f2e8d5;
-    background: #1b090d;
+    color: #f3ede8;
+    background: #0c0708;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -26,7 +26,7 @@
   }
 
   html {
-    background: #1b090d;
+    background: #0c0708;
   }
 
   body {
@@ -41,12 +41,12 @@
 
   button:focus-visible,
   a:focus-visible {
-    outline: 2px solid #dec184;
+    outline: 2px solid #cf6267;
     outline-offset: 5px;
   }
 
   ::selection {
-    color: #1b090d;
-    background: #dec184;
+    color: #f3ede8;
+    background: rgba(175, 60, 64, 0.65);
   }
 }

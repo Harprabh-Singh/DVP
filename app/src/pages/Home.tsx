@@ -4,11 +4,15 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import SplitType from 'split-type'
 import WhatWeDo from '../sections/WhatWeDo'
+import ExploreArtists from '../sections/ExploreArtists'
+import CulturalHeritage from '../sections/CulturalHeritage'
+import JoinTeam from '../sections/JoinTeam'
+import Contact from '../sections/Contact'
 import '../App.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-type ChapterKey = 'purpose' | 'artists' | 'heritage'
+type ChapterKey = 'purpose' | 'artists' | 'heritage' | 'join' | 'contact'
 
 const chapters: Record<ChapterKey, { label: string; title: string; body: string; footnote: string }> = {
   purpose: {
@@ -29,6 +33,18 @@ const chapters: Record<ChapterKey, { label: string; title: string; body: string;
     body: 'We look beyond the performance to document the lineages, instruments, languages and stories that give each art form its identity—always with the artist’s consent and cultural context at the centre.',
     footnote: 'Their knowledge. Their stories. Their rights.',
   },
+  join: {
+    label: 'Join our team',
+    title: 'The circle is open.',
+    body: 'Bring your curiosity, craft and perspective to a shared cultural practice.',
+    footnote: 'Many skills. One purpose.',
+  },
+  contact: {
+    label: 'Contact',
+    title: 'Let’s carry the voice forward.',
+    body: 'Start a conversation with the Desert Voice Project team.',
+    footnote: 'Artists · Bookings · Collaborations',
+  },
 }
 
 export default function Home() {
@@ -43,6 +59,12 @@ export default function Home() {
 
   const openChapter = (chapter: ChapterKey) => {
     setMenuOpen(false)
+    if (chapter !== 'purpose') {
+      setActiveChapter(null)
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      document.getElementById(chapter)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' })
+      return
+    }
     setActiveChapter(chapter)
   }
 
@@ -166,7 +188,7 @@ export default function Home() {
   const chapter = activeChapter ? chapters[activeChapter] : null
 
   return (
-    <main className="dvp-site">
+    <main className="dvp-site" id="top">
       <section className="hero" ref={rootRef} aria-labelledby="hero-title">
         <div className="hero-media" ref={mediaRef}>
           <picture className="hero-picture">
@@ -197,10 +219,11 @@ export default function Home() {
             <button onClick={() => openChapter('purpose')}>Our purpose</button>
             <button onClick={() => openChapter('artists')}>Artists</button>
             <button onClick={() => openChapter('heritage')}>Heritage</button>
+            <button onClick={() => openChapter('join')}>Join us</button>
           </nav>
 
-          <button className="header-cta" onClick={() => openChapter('purpose')}>
-            <span>Discover DVP</span>
+          <button className="header-cta" onClick={() => openChapter('contact')}>
+            <span>Contact us</span>
             <ArrowUpRight size={15} strokeWidth={1.5} />
           </button>
 
@@ -217,7 +240,7 @@ export default function Home() {
         <div className={`mobile-menu ${menuOpen ? 'is-open' : ''}`} aria-hidden={!menuOpen}>
           <div className="mobile-menu-inner">
             <span className="mobile-menu-label">Explore Desert Voice</span>
-            {(['purpose', 'artists', 'heritage'] as ChapterKey[]).map((item, index) => (
+            {(['purpose', 'artists', 'heritage', 'join', 'contact'] as ChapterKey[]).map((item, index) => (
               <button key={item} onClick={() => openChapter(item)} tabIndex={menuOpen ? 0 : -1}>
                 <span>0{index + 1}</span>
                 {chapters[item].label}
@@ -317,6 +340,10 @@ export default function Home() {
         )}
       </section>
       <WhatWeDo />
+      <ExploreArtists />
+      <CulturalHeritage />
+      <JoinTeam />
+      <Contact />
     </main>
   )
 }
