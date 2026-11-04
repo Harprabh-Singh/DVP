@@ -7,7 +7,7 @@ import './Contact.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const contactEmail = 'support@rajasthanleaders.org'
+const contactEmail = 'Hello.desertvoice@gmail.com'
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -72,7 +72,7 @@ export default function Contact() {
               </div>
 
               <div className="contact-meta">
-                <a href="tel:+919610282129"><Phone size={14} strokeWidth={1.35} />+91 96102 82129</a>
+                <a href="tel:+917690052055"><Phone size={14} strokeWidth={1.35} />+91 76900 52055</a>
                 <span>Rajasthan · India</span>
               </div>
 

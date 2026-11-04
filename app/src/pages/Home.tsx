@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ArrowRight, ArrowUpRight, Menu, X } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -56,9 +57,11 @@ export default function Home() {
   const [imageReady, setImageReady] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeChapter, setActiveChapter] = useState<ChapterKey | null>(null)
+  const [dialogClosing, setDialogClosing] = useState(false)
 
   const openChapter = (chapter: ChapterKey) => {
     setMenuOpen(false)
+    setDialogClosing(false)
     if (chapter !== 'purpose') {
       setActiveChapter(null)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -68,17 +71,52 @@ export default function Home() {
     setActiveChapter(chapter)
   }
 
+  const closeChapter = () => setDialogClosing(true)
+
+  useEffect(() => {
+    if (!dialogClosing) return
+    const timeout = window.setTimeout(() => {
+      setActiveChapter(null)
+      setDialogClosing(false)
+    }, 420)
+    return () => window.clearTimeout(timeout)
+  }, [dialogClosing])
+
   useEffect(() => {
     if (!activeChapter) return
     const previousFocus = document.activeElement as HTMLElement | null
-    closeRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    const previousHtmlOverflow = document.documentElement.style.overflow
+    const previousPaddingRight = document.body.style.paddingRight
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`
+    closeRef.current?.focus({ preventScroll: true })
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setActiveChapter(null)
+      if (event.key === 'Escape') setDialogClosing(true)
+      if (event.key !== 'Tab') return
+      const focusable = Array.from(document.querySelectorAll<HTMLElement>('.story-panel a[href], .story-panel button:not([disabled])'))
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (!first || !last) return
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
-      previousFocus?.focus()
+      document.body.style.overflow = previousOverflow
+      document.documentElement.style.overflow = previousHtmlOverflow
+      document.body.style.paddingRight = previousPaddingRight
+      previousFocus?.focus({ preventScroll: true })
     }
   }, [activeChapter])
 
@@ -313,30 +351,32 @@ export default function Home() {
           </button>
         </div>
 
-        {chapter && (
-          <div className="story-dialog" role="presentation" onMouseDown={() => setActiveChapter(null)}>
+        {chapter && createPortal(
+          <div className={`story-dialog ${dialogClosing ? 'is-closing' : ''}`} role="presentation" onMouseDown={closeChapter}>
             <section
               className="story-panel"
               role="dialog"
               aria-modal="true"
               aria-labelledby="story-title"
+              aria-describedby="story-description"
               onMouseDown={(event) => event.stopPropagation()}
             >
               <div className="story-panel-top">
                 <span>{chapter.label}</span>
-                <button ref={closeRef} onClick={() => setActiveChapter(null)} aria-label="Close story preview">
+                <button ref={closeRef} onClick={closeChapter} aria-label="Close story preview">
                   <X size={20} strokeWidth={1.3} />
                 </button>
               </div>
               <span className="story-number" aria-hidden="true">DVP</span>
               <h2 id="story-title">{chapter.title}</h2>
-              <p>{chapter.body}</p>
+              <p id="story-description">{chapter.body}</p>
               <div className="story-footnote">
                 <span />
                 {chapter.footnote}
               </div>
             </section>
-          </div>
+          </div>,
+          document.body,
         )}
       </section>
       <WhatWeDo />

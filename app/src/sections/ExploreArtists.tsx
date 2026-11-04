@@ -92,6 +92,8 @@ export default function ExploreArtists() {
         once: true,
         onEnter: () => {
           gsap.to(elements, { opacity: 1, y: 0, duration: 1.05, ease: 'expo.out', stagger: 0.1 })
+          const curtainTexture = new Image()
+          curtainTexture.src = '/images/theatre-velvet.avif'
           traditions.forEach((item) => {
             const preload = new Image()
             preload.src = item.image
@@ -110,17 +112,38 @@ export default function ExploreArtists() {
     }
     const image = imageRef.current
     const details = detailsRef.current?.querySelectorAll('[data-detail]')
-    if (!image || !details) return
+    const leftCurtain = sectionRef.current?.querySelector('.artist-curtain-left')
+    const rightCurtain = sectionRef.current?.querySelector('.artist-curtain-right')
+    if (!image || !details || !leftCurtain || !rightCurtain) return
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) {
       gsap.set([image, ...details], { opacity: 1, x: 0, y: 0, scale: 1 })
+      gsap.set([leftCurtain, rightCurtain], { display: 'none' })
       return
     }
 
+    const leftFolds = Array.from(leftCurtain.querySelectorAll('.artist-curtain-slice'))
+    const rightFolds = Array.from(rightCurtain.querySelectorAll('.artist-curtain-slice'))
+    const folds = [...leftFolds, ...rightFolds]
     const timeline = gsap.timeline()
     timeline
-      .fromTo(image, { opacity: 0, x: 24, scale: 1.045 }, { opacity: 1, x: 0, scale: 1, duration: 0.78, ease: 'expo.out' })
-      .fromTo(details, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.58, ease: 'expo.out', stagger: 0.055 }, 0.09)
+      .set([leftCurtain, rightCurtain], { visibility: 'visible', opacity: 1, x: 0, xPercent: 0, scaleX: 1, rotationY: 0 })
+      .set(folds, { skewY: 0, scaleY: 1 })
+      .fromTo(image, { scale: 1.035 }, { scale: 1, duration: 1.65, ease: 'expo.out' }, 0)
+      .to(leftCurtain, { scaleX: 0.18, rotationY: -8, duration: 1.5, ease: 'power3.inOut' }, 0.08)
+      .to(rightCurtain, { scaleX: 0.18, rotationY: 8, duration: 1.5, ease: 'power3.inOut' }, 0.08)
+      .to(folds, {
+        skewY: (index) => index % 2 === 0 ? 1.6 : -1.6,
+        scaleY: 1.014,
+        duration: 0.42,
+        ease: 'sine.inOut',
+        stagger: { each: 0.018, from: 'center' },
+        repeat: 1,
+        yoyo: true,
+      }, 0.18)
+      .to([leftCurtain, rightCurtain], { opacity: 0, duration: 0.18, ease: 'power1.out' }, 1.44)
+      .set([leftCurtain, rightCurtain], { visibility: 'hidden' }, 1.64)
+      .fromTo(details, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.58, ease: 'expo.out', stagger: 0.055 }, 0.66)
     return () => { timeline.kill() }
   }, [active])
 
@@ -178,6 +201,24 @@ export default function ExploreArtists() {
               <div className="artist-portrait-scrim" aria-hidden="true" />
               <span className="artist-portrait-language" lang="hi">{tradition.language}</span>
               <span className="artist-portrait-caption">Portrait of a living tradition</span>
+              <div className="artist-curtain artist-curtain-left" aria-hidden="true">
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <span
+                    className="artist-curtain-slice"
+                    key={index}
+                    style={{ left: `${index * (100 / 6)}%`, backgroundPosition: `${(index / 11) * 100}% center` }}
+                  />
+                ))}
+              </div>
+              <div className="artist-curtain artist-curtain-right" aria-hidden="true">
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <span
+                    className="artist-curtain-slice"
+                    key={index}
+                    style={{ left: `${index * (100 / 6)}%`, backgroundPosition: `${((index + 6) / 11) * 100}% center` }}
+                  />
+                ))}
+              </div>
             </div>
             <div className="artist-gallery-controls">
               <span><strong>0{active + 1}</strong> / 0{traditions.length}</span>

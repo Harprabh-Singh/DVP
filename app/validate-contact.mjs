@@ -71,7 +71,7 @@ try {
 
   const result = { desktopContactVisible, formStatus, emailHref, mobileMenuItems, mobileMenuClosed, overflow, imageFormats, reducedOpacity, consoleErrors: errors }
   console.log(JSON.stringify(result, null, 2))
-  if (!desktopContactVisible || !formStatus?.includes('ready in your email app') || emailHref !== 'mailto:support@rajasthanleaders.org' || mobileMenuItems !== 5 || mobileMenuClosed !== 'true' || overflow || imageFormats.length || reducedOpacity !== '1' || errors.length) process.exitCode = 1
+  if (!desktopContactVisible || !formStatus?.includes('ready in your email app') || emailHref !== 'mailto:Hello.desertvoice@gmail.com' || mobileMenuItems !== 5 || mobileMenuClosed !== 'true' || overflow || imageFormats.length || reducedOpacity !== '1' || errors.length) process.exitCode = 1
 } finally {
   if (browser) await browser.close()
   server.kill('SIGTERM')

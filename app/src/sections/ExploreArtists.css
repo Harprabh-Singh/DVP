@@ -235,6 +235,7 @@
   border: 1px solid rgba(197, 163, 99, 0.38);
   border-radius: 48% 48% 2px 2px / 23% 23% 2px 2px;
   background: #1b0c10;
+  perspective: 1100px;
 }
 
 .artist-portrait-frame::after {
@@ -261,6 +262,45 @@
   border-radius: inherit;
   background: linear-gradient(180deg, rgba(16, 8, 10, 0.06) 40%, rgba(16, 8, 10, 0.86) 100%);
   pointer-events: none;
+}
+
+.artist-curtain {
+  position: absolute;
+  z-index: 7;
+  top: -2px;
+  bottom: -2px;
+  width: calc(50% + 2px);
+  overflow: hidden;
+  visibility: hidden;
+  filter: brightness(0.76) saturate(0.8);
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.artist-curtain-slice {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(16.667% + 1px);
+  background-image: url('/images/theatre-velvet.avif');
+  background-repeat: no-repeat;
+  background-size: 1200% 100%;
+  backface-visibility: hidden;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+.artist-curtain-left {
+  left: -1px;
+  transform-origin: left center;
+  box-shadow: inset -24px 0 30px rgba(0, 0, 0, 0.34), 8px 0 22px rgba(0, 0, 0, 0.24);
+}
+
+.artist-curtain-right {
+  right: -1px;
+  transform-origin: right center;
+  box-shadow: inset 24px 0 30px rgba(0, 0, 0, 0.34), -8px 0 22px rgba(0, 0, 0, 0.24);
 }
 
 .artist-portrait-language {
@@ -760,6 +800,10 @@
   .artist-details [data-detail] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .artist-curtain {
+    display: none;
   }
 
   .artist-category,
