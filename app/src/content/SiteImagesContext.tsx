@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { imageCatalog } from './imageCatalog'
 import type { SiteImageKey } from './imageCatalog'
 
 type ImageMap = Partial<Record<SiteImageKey, string>>
-type StorageMode = 'local' | 'cloud'
+type StorageMode = 'local' | 'cloud' | 'unconfigured'
 
 type SiteImagesValue = {
   ready: boolean
@@ -41,7 +41,7 @@ export function SiteImagesProvider({ children }: { children: ReactNode }) {
       .then((data) => {
         if (!active) return
         setOverrides(data.images || {})
-        setStorage(data.storage === 'cloud' ? 'cloud' : 'local')
+        setStorage(data.storage === 'cloud' ? 'cloud' : data.storage === 'unconfigured' ? 'unconfigured' : 'local')
         setReady(true)
       })
       .catch(() => { if (active) setReady(true) })
@@ -50,6 +50,19 @@ export function SiteImagesProvider({ children }: { children: ReactNode }) {
 
   const saveImage = async (key: SiteImageKey, file: File) => {
     if (file.type !== 'image/avif' && !file.name.toLowerCase().endsWith('.avif')) throw new Error('Please choose an AVIF image.')
+    if (storage === 'unconfigured') throw new Error('Connect Vercel Blob to this deployment before publishing images.')
+    if (storage === 'cloud') {
+      const { upload } = await import('@vercel/blob/client')
+      const blob = await upload(`dvp/${key}-${Date.now()}.avif`, file, {
+        access: 'public',
+        handleUploadUrl: '/api/blob/upload',
+        clientPayload: key,
+        contentType: 'image/avif',
+        multipart: file.size > 4 * 1024 * 1024,
+      })
+      setOverrides((current) => ({ ...current, [key]: blob.url }))
+      return
+    }
     const body = new FormData()
     body.append('image', file)
     const response = await fetch(`/api/images/${key}`, { method: 'PUT', body })
@@ -69,7 +82,7 @@ export function SiteImagesProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const value = useMemo<SiteImagesValue>(() => ({
+  const value: SiteImagesValue = {
     ready,
     storage,
     getImage: (key) => overrides[key] ?? defaults[key],
@@ -80,7 +93,7 @@ export function SiteImagesProvider({ children }: { children: ReactNode }) {
     isCustomised: (key) => Boolean(overrides[key]),
     saveImage,
     resetImage,
-  }), [overrides, ready, storage])
+  }
 
   return <SiteImagesContext.Provider value={value}>{children}</SiteImagesContext.Provider>
 }

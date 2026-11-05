@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "start": "node server/index.mjs --serve",
-    "setup-admin": "node server/setup-admin.mjs"
+    "setup-admin": "node server/setup-admin.mjs",
+    "vercel:env": "node server/print-vercel-env.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1161.0",
@@ -39,6 +40,7 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@vercel/blob": "^2.8.2",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -91,5 +93,10 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "4.6.7"
+    }
   }
 }

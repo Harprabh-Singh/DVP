@@ -123,7 +123,7 @@ export default function Admin() {
           <div><strong>Desert Voice</strong><span>Image Studio</span></div>
         </Link>
         <div className="admin-header-actions">
-          <span className="admin-save-status"><i />{storage === 'cloud' ? 'Shared cloud library' : 'Shared server library'}</span>
+          <span className="admin-save-status"><i />{storage === 'cloud' ? 'Shared cloud library' : storage === 'unconfigured' ? 'Cloud storage not connected' : 'Shared server library'}</span>
           <Link to="/" className="admin-view-site">View website <ArrowUpRight size={15} strokeWidth={1.4} /></Link>
           <button className="admin-logout" onClick={signOut} aria-label="Sign out of Image Studio" title="Sign out"><LogOut size={16} strokeWidth={1.35} /><span>Sign out</span></button>
         </div>
@@ -142,7 +142,7 @@ export default function Admin() {
           </nav>
           <div className="admin-storage-note">
             <ImageIcon size={18} strokeWidth={1.2} />
-            <p>{storage === 'cloud' ? 'Images are published to shared cloud storage and appear on every device.' : 'Images are saved on the shared website server and appear on every device connected to it.'}</p>
+            <p>{storage === 'cloud' ? 'Images are published to shared cloud storage and appear on every device.' : storage === 'unconfigured' ? 'Connect Vercel Blob in your project’s Storage tab to enable cloud publishing.' : 'Images are saved on the shared website server and appear on every device connected to it.'}</p>
           </div>
         </aside>
 
