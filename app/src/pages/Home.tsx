@@ -9,6 +9,7 @@ import ExploreArtists from '../sections/ExploreArtists'
 import CulturalHeritage from '../sections/CulturalHeritage'
 import JoinTeam from '../sections/JoinTeam'
 import Contact from '../sections/Contact'
+import { useSiteImages } from '../content/SiteImagesContext'
 import '../App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -49,6 +50,7 @@ const chapters: Record<ChapterKey, { label: string; title: string; body: string;
 }
 
 export default function Home() {
+  const { getImage } = useSiteImages()
   const rootRef = useRef<HTMLElement>(null)
   const mediaRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
@@ -230,11 +232,11 @@ export default function Home() {
       <section className="hero" ref={rootRef} aria-labelledby="hero-title">
         <div className="hero-media" ref={mediaRef}>
           <picture className="hero-picture">
-            <source media="(max-width: 700px)" srcSet="/images/dvp-hero-mobile-full.avif" />
+            <source media="(max-width: 700px)" srcSet={getImage('heroMobile')} />
             <img
               ref={imageRef}
               className="hero-image"
-              src="/images/dvp-hero.avif"
+              src={getImage('heroDesktop')}
               alt="Manganiyar folk musicians performing in the Thar desert at dusk"
               fetchPriority="high"
               onLoad={() => setImageReady(true)}

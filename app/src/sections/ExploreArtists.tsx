@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useSiteImages } from '../content/SiteImagesContext'
 import './ExploreArtists.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -66,6 +67,7 @@ const traditions: Tradition[] = [
 ]
 
 export default function ExploreArtists() {
+  const { getImageBySrc } = useSiteImages()
   const sectionRef = useRef<HTMLElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const detailsRef = useRef<HTMLDivElement>(null)
@@ -191,7 +193,7 @@ export default function ExploreArtists() {
                 key={tradition.id}
                 ref={imageRef}
                 className="artist-portrait-image"
-                src={tradition.image}
+                src={getImageBySrc(tradition.image)}
                 alt={tradition.alt}
                 width="1024"
                 height="1280"

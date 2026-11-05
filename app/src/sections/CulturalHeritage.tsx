@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Plus } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useSiteImages } from '../content/SiteImagesContext'
 import './CulturalHeritage.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -46,6 +47,7 @@ const heritageItems = [
 ]
 
 export default function CulturalHeritage() {
+  const { getImageBySrc } = useSiteImages()
   const sectionRef = useRef<HTMLElement>(null)
   const motionRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
@@ -144,7 +146,7 @@ export default function CulturalHeritage() {
                 <img
                   key={item.id}
                   ref={imageRef}
-                  src={item.image}
+                  src={getImageBySrc(item.image)}
                   alt={item.alt}
                   width="1024"
                   height="1152"

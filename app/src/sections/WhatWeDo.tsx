@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useSiteImages } from '../content/SiteImagesContext'
 import './WhatWeDo.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -42,6 +43,7 @@ const activities = [
 ]
 
 export default function WhatWeDo() {
+  const { getImage, getImageBySrc } = useSiteImages()
   const sectionRef = useRef<HTMLElement>(null)
   const progressRef = useRef<HTMLSpanElement>(null)
   const activeRef = useRef(0)
@@ -122,12 +124,12 @@ export default function WhatWeDo() {
               <div className={`work-background work-background-${index}`} key={activity.title}>
                 <picture className="work-picture">
                   {index === 2 && (
-                    <source media="(max-width: 700px)" srcSet="/images/dvp-hero-mobile-full.avif" />
+                    <source media="(max-width: 700px)" srcSet={getImage('heroMobile')} />
                   )}
                   {index === 3 && (
-                    <source media="(max-width: 700px)" srcSet="/images/work-promote-mobile.avif" />
+                    <source media="(max-width: 700px)" srcSet={getImage('workPromoteMobile')} />
                   )}
-                  <img src={activity.image} alt="" loading={index === 0 ? 'eager' : 'lazy'} />
+                  <img src={getImageBySrc(activity.image)} alt="" loading={index === 0 ? 'eager' : 'lazy'} />
                 </picture>
               </div>
             ))}
@@ -186,7 +188,7 @@ export default function WhatWeDo() {
         <h2 id="work-reduced-title">What we do</h2>
         {activities.map((activity, index) => (
           <article key={activity.title}>
-            <img src={activity.image} alt={activity.alt} loading="lazy" />
+            <img src={getImageBySrc(activity.image)} alt={activity.alt} loading="lazy" />
             <span>0{index + 1} / {activity.chapter}</span>
             <h3>{activity.title}.</h3>
             <p>{activity.description}</p>
