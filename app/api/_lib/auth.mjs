@@ -1,9 +1,12 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
 const cookieName = 'dvp_admin'
+const defaultPasswordHash = '$2b$12$B6VvEHOpL2ZVRw9pMEYrxuG7rsUMxA7gHTTr1M1ZhoG82x0KRFxzS'
 
 function secret() {
-  return process.env.SESSION_SECRET || ''
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET
+  if (!process.env.CLOUDINARY_URL) return ''
+  return createHmac('sha256', 'dvp-admin-session-v1').update(process.env.CLOUDINARY_URL).digest('base64url')
 }
 
 function sign(value) {
@@ -11,7 +14,11 @@ function sign(value) {
 }
 
 export function adminEmail() {
-  return (process.env.ADMIN_EMAIL || '').trim().toLowerCase()
+  return (process.env.ADMIN_EMAIL || 'harprabhnanda@gmail.com').trim().toLowerCase()
+}
+
+export function adminPasswordHash() {
+  return process.env.ADMIN_PASSWORD_HASH || defaultPasswordHash
 }
 
 export function createSession() {

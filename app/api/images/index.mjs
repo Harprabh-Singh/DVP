@@ -1,9 +1,9 @@
-import { blobConfigured, readLibrary } from '../_lib/library.mjs'
+import { cloudConfigured, readLibrary } from '../_lib/library.mjs'
 
 export default async function images(req, res) {
   res.setHeader('Cache-Control', 'no-store')
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed.' })
-  if (!blobConfigured()) return res.json({ images: {}, storage: 'unconfigured', configured: false })
+  if (!cloudConfigured()) return res.json({ images: {}, storage: 'unconfigured', configured: false })
   try {
     const library = await readLibrary()
     const overrides = Object.fromEntries(Object.entries(library).map(([key, record]) => [key, record.url]))

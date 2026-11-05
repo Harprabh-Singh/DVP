@@ -50,17 +50,11 @@ export function SiteImagesProvider({ children }: { children: ReactNode }) {
 
   const saveImage = async (key: SiteImageKey, file: File) => {
     if (file.type !== 'image/avif' && !file.name.toLowerCase().endsWith('.avif')) throw new Error('Please choose an AVIF image.')
-    if (storage === 'unconfigured') throw new Error('Connect Vercel Blob to this deployment before publishing images.')
+    if (storage === 'unconfigured') throw new Error('Add Neon and Cloudinary to this deployment before publishing images.')
     if (storage === 'cloud') {
-      const { upload } = await import('@vercel/blob/client')
-      const blob = await upload(`dvp/${key}-${Date.now()}.avif`, file, {
-        access: 'public',
-        handleUploadUrl: '/api/blob/upload',
-        clientPayload: key,
-        contentType: 'image/avif',
-        multipart: file.size > 4 * 1024 * 1024,
-      })
-      setOverrides((current) => ({ ...current, [key]: blob.url }))
+      const { publishCloudinaryImage } = await import('./cloudinaryUpload')
+      const url = await publishCloudinaryImage(key, file)
+      setOverrides((current) => ({ ...current, [key]: url }))
       return
     }
     const body = new FormData()

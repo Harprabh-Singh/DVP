@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { adminEmail, requireSameOrigin, setSessionCookie } from '../_lib/auth.mjs'
+import { adminEmail, adminPasswordHash, requireSameOrigin, setSessionCookie } from '../_lib/auth.mjs'
 
 const attempts = new Map()
 const windowMs = 15 * 60 * 1000
@@ -16,7 +16,7 @@ export default async function login(req, res) {
 
   const email = String(req.body?.email || '').trim().toLowerCase()
   const password = String(req.body?.password || '')
-  const passwordHash = process.env.ADMIN_PASSWORD_HASH || ''
+  const passwordHash = adminPasswordHash()
   const valid = Boolean(passwordHash) && email === adminEmail() && password.length <= 256 && await bcrypt.compare(password, passwordHash)
   if (!valid) {
     attempts.set(ip, [...recent, now])

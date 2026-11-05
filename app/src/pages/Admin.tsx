@@ -142,7 +142,7 @@ export default function Admin() {
           </nav>
           <div className="admin-storage-note">
             <ImageIcon size={18} strokeWidth={1.2} />
-            <p>{storage === 'cloud' ? 'Images are published to shared cloud storage and appear on every device.' : storage === 'unconfigured' ? 'Connect Vercel Blob in your project’s Storage tab to enable cloud publishing.' : 'Images are saved on the shared website server and appear on every device connected to it.'}</p>
+            <p>{storage === 'cloud' ? 'Images are published through Cloudinary and Neon, and appear on every device.' : storage === 'unconfigured' ? 'Add DATABASE_URL and CLOUDINARY_URL in Vercel to enable cloud publishing.' : 'Images are saved on the shared website server and appear on every device connected to it.'}</p>
           </div>
         </aside>
 

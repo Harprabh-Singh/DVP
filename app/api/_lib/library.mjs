@@ -1,15 +1,35 @@
-import { del, list, put } from '@vercel/blob'
+import { neon } from '@neondatabase/serverless'
+import { cloudinaryConfigured, destroyCloudinaryImage } from './cloudinary.mjs'
 
-const libraryPath = 'dvp/library.json'
 const imageKeys = new Set([
   'heroDesktop', 'heroMobile', 'workDiscover', 'workDocument', 'workRecognise',
   'workPromote', 'workPromoteMobile', 'artistVocalist', 'artistInstrumentalist',
   'artistDancer', 'artistPercussionist', 'heritageMusic', 'heritageInstruments',
   'heritageDance', 'heritageOralTraditions',
 ])
+let schemaPromise
 
-export function blobConfigured() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+function database() {
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not configured.')
+  return neon(process.env.DATABASE_URL)
+}
+
+async function ensureSchema() {
+  if (!schemaPromise) {
+    schemaPromise = database()`
+      CREATE TABLE IF NOT EXISTS dvp_images (
+        key TEXT PRIMARY KEY,
+        url TEXT NOT NULL,
+        public_id TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `.catch((error) => { schemaPromise = null; throw error })
+  }
+  await schemaPromise
+}
+
+export function cloudConfigured() {
+  return Boolean(process.env.DATABASE_URL && cloudinaryConfigured())
 }
 
 export function validImageKey(key) {
@@ -23,25 +43,32 @@ export function isAvif(buffer) {
 }
 
 export async function readLibrary() {
-  const { blobs } = await list({ prefix: libraryPath, limit: 20 })
-  const manifest = blobs.find((blob) => blob.pathname === libraryPath)
-  if (!manifest) return {}
-  const response = await fetch(`${manifest.url}?v=${Date.now()}`, { cache: 'no-store' })
-  if (!response.ok) throw new Error('The shared image library could not be read.')
-  const library = await response.json()
-  return library && typeof library === 'object' ? library : {}
+  await ensureSchema()
+  const rows = await database()`SELECT key, url, public_id FROM dvp_images`
+  return Object.fromEntries(rows.map((row) => [row.key, { url: row.url, publicId: row.public_id }]))
 }
 
-export async function writeLibrary(library) {
-  await put(libraryPath, JSON.stringify(library), {
-    access: 'public',
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: 'application/json',
-    cacheControlMaxAge: 0,
-  })
+export async function saveImageRecord(key, record) {
+  await ensureSchema()
+  const previousRows = await database()`SELECT url, public_id FROM dvp_images WHERE key = ${key} LIMIT 1`
+  await database()`
+    INSERT INTO dvp_images (key, url, public_id, updated_at)
+    VALUES (${key}, ${record.url}, ${record.publicId}, NOW())
+    ON CONFLICT (key) DO UPDATE SET
+      url = EXCLUDED.url,
+      public_id = EXCLUDED.public_id,
+      updated_at = NOW()
+  `
+  const previous = previousRows[0]
+  return previous ? { url: previous.url, publicId: previous.public_id } : null
+}
+
+export async function deleteImageRecord(key) {
+  await ensureSchema()
+  const rows = await database()`DELETE FROM dvp_images WHERE key = ${key} RETURNING url, public_id`
+  return rows[0] ? { url: rows[0].url, publicId: rows[0].public_id } : null
 }
 
 export async function removeImage(record) {
-  if (record?.url) await del(record.url)
+  if (record?.publicId) await destroyCloudinaryImage(record.publicId)
 }
